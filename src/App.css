@@ -1,0 +1,100 @@
+/* App.css — component-level resets */
+.App {
+  height: 100%;
+}
+
+/* Dark Theme Overrides */
+body.dark-theme {
+  background: #121212 !important;
+  color: #e0e0e0 !important;
+}
+
+.dark-theme div[class*="bg-white"] {
+  background-color: #1e1e1e !important;
+}
+
+.dark-theme div[class*="bg-gray-50"] {
+  background-color: #121212 !important;
+}
+
+.dark-theme div[class*="text-gray-800"] {
+  color: #e0e0e0 !important;
+}
+
+.dark-theme div[class*="bg-gray-100"] {
+  background-color: #2c2c2e !important;
+  color: #e0e0e0 !important;
+}
+
+.dark-theme .prose code {
+  background-color: #2c2c2e !important;
+  color: #e6b8cc !important;
+}
+
+.dark-theme div[class*="border-gray-200"] {
+  border-color: #333 !important;
+}
+
+/* For main styled components with hardcoded hexes */
+.dark-theme main,
+.dark-theme aside,
+.dark-theme .input-zone,
+.dark-theme .input-box {
+  background: #1e1e1e !important;
+  border-color: #333 !important;
+}
+
+.dark-theme aside {
+  background: #0f0f0f !important;
+  border-right-color: #222 !important;
+}
+
+.dark-theme textarea {
+  color: #fff !important;
+}
+
+/* Custom dark overrides for buttons and items */
+.dark-theme .sidebar-btn {
+  background: #1e1e1e !important;
+  color: #ececec !important;
+  border-color: #333 !important;
+}
+
+.dark-theme .sidebar-btn:hover {
+  background: #2c2c2e !important;
+}
+
+.dark-theme .mode-item {
+  color: #e0e0e0 !important;
+}
+
+.dark-theme .mode-item-active {
+  background: #2c2c2e !important;
+  color: #a78bfa !important;
+}
+
+.dark-theme .mode-item-active .anticon {
+  color: #a78bfa !important;
+}
+
+.dark-theme .mode-item:hover {
+  background: #2c2c2e !important;
+}
+
+.dark-theme .bottom-nav-item {
+  color: #e0e0e0 !important;
+}
+
+.dark-theme .bottom-nav-item:hover {
+  background: #2c2c2e !important;
+}
+
+.dark-theme .input-box {
+  background: #121212 !important;
+  border-color: #333 !important;
+}
+
+.dark-theme .input-box:focus-within {
+  border-color: #7c3aed !important;
+  background: #0a0a0a !important;
+}

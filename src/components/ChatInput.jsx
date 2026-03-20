@@ -1,0 +1,315 @@
+import React, { useState, useRef, useCallback } from 'react';
+import styled from 'styled-components';
+import { Button, Typography, Tooltip, Tag, Spin } from 'antd';
+import {
+  SendOutlined,
+  PaperClipOutlined,
+  StopOutlined,
+  FilePdfOutlined,
+  LinkOutlined,
+  HeartOutlined,
+  CheckCircleOutlined,
+  LoadingOutlined,
+} from '@ant-design/icons';
+
+const { Text } = Typography;
+
+const InputZone = styled.div`
+  padding: 12px 40px 8px;
+  background: #ffffff;
+  border-top: 1px solid #f0f0f0;
+
+  @media (max-width: 768px) {
+    padding: 12px 16px 8px;
+  }
+`;
+
+const PDFBanner = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f3effe;
+  border: 1px solid #d0b8ff;
+  border-radius: 10px;
+  padding: 8px 14px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: #7c3aed;
+  font-weight: 500;
+`;
+
+const InputBox = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1.5px solid #d1d1d6;
+  border-radius: 14px;
+  padding: 10px 12px;
+  background: #fafafa;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:focus-within {
+    border-color: #7c3aed;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+    background: #ffffff;
+  }
+`;
+
+const AttachInput = styled.input`
+  display: none;
+`;
+
+const AttachBtn = styled(Button)`
+  color: #8e8e93 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 4px !important;
+  height: auto !important;
+  flex-shrink: 0;
+  font-size: 16px !important;
+
+  &:hover {
+    color: #7c3aed !important;
+  }
+`;
+
+const StyledTextarea = styled.textarea`
+  flex: 1;
+  border: none;
+  outline: none;
+  resize: none;
+  font-size: 14px;
+  font-family: inherit;
+  color: #1a1a1a;
+  background: transparent;
+  line-height: 1.5;
+  max-height: 160px;
+  overflow-y: auto;
+  padding: 2px 0;
+
+  &::placeholder {
+    color: #b0b0b8;
+  }
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb { background: #d1d1d6; border-radius: 4px; }
+`;
+
+const EnterHint = styled(Text)`
+  font-size: 12px;
+  color: #b0b0b8;
+  white-space: nowrap;
+  flex-shrink: 0;
+`;
+
+const SendBtn = styled(Button)`
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 10px !important;
+  background: ${({ $disabled }) =>
+    $disabled ? '#e5e5ea' : 'linear-gradient(135deg,#7c3aed,#9d5cf0)'} !important;
+  border: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0;
+  box-shadow: ${({ $disabled }) =>
+    $disabled ? 'none' : '0 2px 10px rgba(124,58,237,0.35)'} !important;
+  transition: transform 0.15s !important;
+
+  .anticon {
+    font-size: 15px !important;
+    color: ${({ $disabled }) => ($disabled ? '#b0b0b8' : '#ffffff')} !important;
+  }
+
+  &:hover:not([disabled]) {
+    transform: scale(1.06) !important;
+  }
+`;
+
+const StopBtn = styled(Button)`
+  border-radius: 10px !important;
+  border: 1.5px solid #ff4d4f !important;
+  color: #ff4d4f !important;
+  background: #fff5f5 !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  height: 36px !important;
+  flex-shrink: 0;
+
+  &:hover {
+    background: #ffe0e0 !important;
+  }
+`;
+
+const Footer = styled.div`
+  text-align: center;
+  margin-top: 8px;
+  margin-bottom: 4px;
+`;
+
+const FooterText = styled(Text)`
+  font-size: 11.5px;
+  color: #b0b0b8;
+`;
+
+const ChatInput = ({
+  onSend,
+  isStreaming,
+  onStop,
+  mode,
+  onPDFUpload,
+  onURLUpload,
+  uploading,
+  uploadedFile,
+  sessionReady,
+}) => {
+  const [value, setValue] = useState('');
+  const textareaRef = useRef(null);
+  const fileRef = useRef(null);
+
+  const handleSend = useCallback(() => {
+    if (!value.trim() || isStreaming || uploading) return;
+    
+    // For weblink mode, first submission is the URL
+    if (mode === 'weblink' && !sessionReady) {
+        onURLUpload(value.trim());
+        setValue('');
+        return;
+    }
+
+    // Block document mode if PDF not ready
+    if (mode === 'document' && !sessionReady) return;
+    
+    onSend(value, mode);
+    setValue('');
+    if (textareaRef.current) textareaRef.current.style.height = 'auto';
+  }, [value, isStreaming, onSend, mode, sessionReady, uploading, onURLUpload]);
+
+  const handleKeyDown = useCallback((e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  }, [handleSend]);
+
+  const handleInput = (e) => {
+    setValue(e.target.value);
+    const el = textareaRef.current;
+    if (el) {
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file && onPDFUpload) onPDFUpload(file);
+    e.target.value = '';
+  };
+
+  const getPlaceholder = () => {
+    if (mode === 'document') {
+      if (uploading) return 'Processing PDF...';
+      if (!sessionReady) return 'Upload a PDF first, then ask questions...';
+      return `Ask about "${uploadedFile}"...`;
+    }
+    if (mode === 'weblink') {
+      if (uploading) return 'Extracting data from website...';
+      if (!sessionReady) return 'Paste a website URL and press Enter...';
+      return `Ask about the website...`;
+    }
+    if (mode === 'coding') return 'Ask a coding question...';
+    if (mode === 'truelover') return 'Send a flirty message...';
+    return 'Ask anything...';
+  };
+
+  const canSend =
+    value.trim() &&
+    !isStreaming &&
+    !uploading &&
+    (mode !== 'document' || sessionReady);
+
+  return (
+    <InputZone className="input-zone">
+      {/* Ready Banner */}
+      {(mode === 'document' || mode === 'weblink') && sessionReady && (
+        <PDFBanner>
+          <CheckCircleOutlined />
+          <span>{uploadedFile}</span>
+          <Tag color="purple" style={{ marginLeft: 'auto', fontSize: 11 }}>
+            RAG Active
+          </Tag>
+        </PDFBanner>
+      )}
+
+      {/* Uploading indicator */}
+      {(mode === 'document' || mode === 'weblink') && uploading && (
+        <PDFBanner style={{ borderColor: '#faad14', background: '#fffbe6', color: '#d48806' }}>
+          <Spin indicator={<LoadingOutlined />} size="small" />
+          <span>{mode === 'weblink' ? 'Extracting website data...' : 'Processing PDF and building knowledge base...'}</span>
+        </PDFBanner>
+      )}
+
+      <InputBox className="input-box">
+        {/* Attach / Type button */}
+        <Tooltip
+          title={
+            mode === 'document'
+              ? 'Upload a PDF to chat with'
+              : mode === 'weblink'
+              ? 'Web Link mode active'
+              : mode === 'truelover'
+              ? 'Send some love'
+              : 'Attach file (switch to Document mode for PDFs)'
+          }
+        >
+          <AttachBtn
+            icon={mode === 'weblink' ? <LinkOutlined /> : mode === 'document' ? <FilePdfOutlined /> : mode === 'truelover' ? <HeartOutlined /> : <PaperClipOutlined />}
+            type="text"
+            onClick={() => mode === 'document' && fileRef.current?.click()}
+            style={(mode === 'document' || mode === 'weblink' || mode === 'truelover') ? { color: '#7c3aed' } : {}}
+            disabled={mode === 'weblink' || mode === 'truelover'}
+          />
+        </Tooltip>
+        <AttachInput
+          ref={fileRef}
+          type="file"
+          accept=".pdf"
+          onChange={handleFileChange}
+        />
+
+        <StyledTextarea
+          ref={textareaRef}
+          rows={1}
+          placeholder={getPlaceholder()}
+          value={value}
+          onChange={handleInput}
+          onKeyDown={handleKeyDown}
+          disabled={isStreaming || uploading || (mode === 'document' && !sessionReady)}
+        />
+        <EnterHint>⏎ Enter</EnterHint>
+
+        {isStreaming ? (
+          <StopBtn icon={<StopOutlined />} onClick={onStop}>
+            Stop
+          </StopBtn>
+        ) : (
+          <SendBtn
+            $disabled={!canSend}
+            disabled={!canSend}
+            icon={<SendOutlined />}
+            onClick={handleSend}
+          />
+        )}
+      </InputBox>
+
+      <Footer>
+        <FooterText>AI responses may produce inaccurate information.</FooterText>
+      </Footer>
+    </InputZone>
+  );
+};
+
+export default ChatInput;
