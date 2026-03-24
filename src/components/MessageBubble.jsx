@@ -31,7 +31,7 @@ if (typeof document !== 'undefined' && !document.getElementById('typing-indicato
 }
 
 /* ---------- Component ---------- */
-const MessageBubble = ({ message, selectedMode }) => {
+const MessageBubble = ({ message, selectedMode, onRetry }) => {
   const isUser = message.role === "user";
   const isStreaming = message.streaming;
   const isWaiting = isStreaming && !message.content; // bot waiting for first token
@@ -102,6 +102,40 @@ const MessageBubble = ({ message, selectedMode }) => {
               >
                 {message.content}
               </ReactMarkdown>
+              
+              {message.error && (
+                <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg flex flex-col gap-3">
+                  <div className="flex items-center gap-2 text-red-700 text-sm font-medium">
+                    <span>⚠️ {message.error}</span>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={onRetry}
+                      className="px-3 py-1.5 bg-white border border-red-300 text-red-700 text-xs font-semibold rounded-md hover:bg-red-50 transition-colors shadow-sm"
+                    >
+                      Retry Now
+                    </button>
+                    
+                    {message.isRateLimit && (
+                      <button 
+                        onClick={() => window.open('https://openrouter.ai/settings/keys', '_blank')}
+                        className="px-3 py-1.5 bg-red-600 text-white text-xs font-semibold rounded-md hover:bg-red-700 transition-colors shadow-sm"
+                      >
+                        Verify / Check Credits
+                      </button>
+                    ) || (
+                      <button 
+                        onClick={() => alert("Please contact support or sign-in again to verify your identity.")}
+                        className="px-3 py-1.5 bg-gray-800 text-white text-xs font-semibold rounded-md hover:bg-black transition-colors shadow-sm"
+                      >
+                        Verify Identity
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {isStreaming && (
                 <span className="inline-block w-2.5 h-4 ml-1 bg-gray-400 animate-pulse align-middle rounded-sm"></span>
               )}

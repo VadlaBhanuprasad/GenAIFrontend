@@ -29,7 +29,7 @@ const EmptyState = styled.div`
   font-size: 14px;
 `;
 
-const ChatWindow = ({ messages, selectedMode }) => {
+const ChatWindow = ({ messages, selectedMode, onRetry }) => {
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ const ChatWindow = ({ messages, selectedMode }) => {
   return (
     <WindowWrapper>
       {messages.map(msg => (
-        <MessageBubble key={msg.id} message={msg} selectedMode={selectedMode} />
+        <MessageBubble key={msg.id} message={msg} selectedMode={selectedMode} onRetry={onRetry} />
       ))}
       <div ref={bottomRef} />
     </WindowWrapper>

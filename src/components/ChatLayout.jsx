@@ -30,7 +30,7 @@ const ChatLayout = () => {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     
     // Pass selectedMode so the hook operates on the correct chat history
-    const { messages, isStreaming, sendMessage, stopStreaming, newChat } = useChat(selectedMode);
+    const { messages, isStreaming, sendMessage, retryLastMessage, stopStreaming, newChat } = useChat(selectedMode);
     const { uploading, sessionId, uploadedFile, uploadPDF, uploadURL, clearUpload } = useDocumentUpload();
 
     const handleSend = (text) => {
@@ -83,7 +83,7 @@ const ChatLayout = () => {
                 {isWelcome ? (
                     <WelcomeScreen />
                 ) : (
-                    <ChatWindow messages={messages} selectedMode={selectedMode} />
+                    <ChatWindow messages={messages} selectedMode={selectedMode} onRetry={retryLastMessage} />
                 )}
                 <ChatInput
                     onSend={handleSend}

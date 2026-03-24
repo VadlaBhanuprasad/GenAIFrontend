@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 
-const API_BASE = import.meta.env.VITE_API_URL || '';
+const API_BASE = import.meta.env.GenAI_API_URL || 'https://genaibackend-v224.onrender.com';
 
 let messageIdCounter = 1;
 
@@ -12,6 +12,7 @@ export function useChat(activeMode = 'general') {
         weblink: [],
     });
     const [isStreaming, setIsStreaming] = useState(false);
+    const lastRequestRef = useRef(null); // To store params for retry
     const abortRef = useRef(null);
 
     const messages = messagesByMode[activeMode] || [];
@@ -52,7 +53,7 @@ export function useChat(activeMode = 'general') {
                 if (chunk.startsWith('[ERROR]')) {
                     throw new Error(chunk.slice(8));
                 }
-                
+
                 let textChunk = chunk;
                 try {
                     textChunk = JSON.parse(chunk);
@@ -77,27 +78,47 @@ export function useChat(activeMode = 'general') {
     }, []);
 
     // ── Send chat message ───────────────────────────────────────────────────
-    const sendMessage = useCallback(async (text, mode = 'general', sessionId = null) => {
+    const sendMessage = useCallback(async (text, mode = 'general', sessionId = null, isRetry = false) => {
         if (!text.trim() || isStreaming) return;
 
-        const userMsg = {
-            id: messageIdCounter++,
-            role: 'user',
-            content: text.trim(),
-            timestamp: new Date(),
-        };
+        // Store request for potential retry
+        lastRequestRef.current = { text, mode, sessionId };
 
-        const assistantId = messageIdCounter++;
-        const assistantMsg = { id: assistantId, role: 'assistant', content: '', timestamp: new Date(), streaming: true };
+        let assistantId;
 
-        setMessagesByMode(prev => ({
-            ...prev,
-            [mode]: [...(prev[mode] || []), userMsg, assistantMsg]
-        }));
+        if (!isRetry) {
+            const userMsg = {
+                id: messageIdCounter++,
+                role: 'user',
+                content: text.trim(),
+                timestamp: new Date(),
+            };
+
+            assistantId = messageIdCounter++;
+            const assistantMsg = { id: assistantId, role: 'assistant', content: '', timestamp: new Date(), streaming: true };
+
+            setMessagesByMode(prev => ({
+                ...prev,
+                [mode]: [...(prev[mode] || []), userMsg, assistantMsg]
+            }));
+        } else {
+            // Find the last assistant message and clear its content for retry
+            const modeMsgs = messagesByMode[mode] || [];
+            const lastAssistant = modeMsgs.filter(m => m.role === 'assistant').pop();
+            if (!lastAssistant) return;
+            assistantId = lastAssistant.id;
+
+            setMessagesByMode(prev => ({
+                ...prev,
+                [mode]: (prev[mode] || []).map(m =>
+                    m.id === assistantId ? { ...m, content: '', error: null, streaming: true } : m
+                )
+            }));
+        }
+
         setIsStreaming(true);
 
         try {
-            // Choose endpoint: if mode=document or mode=weblink use /api/pdf/query, else /api/chat
             if ((mode === 'document' || mode === 'weblink') && sessionId) {
                 await _streamSSE(
                     `${API_BASE}/api/pdf/query`,
@@ -115,11 +136,17 @@ export function useChat(activeMode = 'general') {
             }
         } catch (err) {
             if (err.name !== 'AbortError') {
+                const isRateLimit = err.message.includes('429');
                 setMessagesByMode(prev => ({
                     ...prev,
                     [mode]: (prev[mode] || []).map(m =>
                         m.id === assistantId
-                            ? { ...m, content: m.content || `⚠️ Error: ${err.message}` }
+                            ? {
+                                ...m,
+                                content: m.content || `⚠️ Error: ${err.message}`,
+                                error: err.message,
+                                isRateLimit: isRateLimit
+                            }
                             : m
                     )
                 }));
@@ -131,7 +158,14 @@ export function useChat(activeMode = 'general') {
             }));
             setIsStreaming(false);
         }
-    }, [isStreaming, _streamSSE]);
+    }, [isStreaming, _streamSSE, messagesByMode]);
+
+    const retryLastMessage = useCallback(() => {
+        if (lastRequestRef.current) {
+            const { text, mode, sessionId } = lastRequestRef.current;
+            sendMessage(text, mode, sessionId, true);
+        }
+    }, [sendMessage]);
 
     // ── Stop streaming ──────────────────────────────────────────────────────
     const stopStreaming = useCallback(() => {
@@ -158,7 +192,7 @@ export function useChat(activeMode = 'general') {
         setIsStreaming(false);
     }, []);
 
-    return { messages, isStreaming, sendMessage, stopStreaming, newChat };
+    return { messages, isStreaming, sendMessage, retryLastMessage, stopStreaming, newChat };
 }
 
 
