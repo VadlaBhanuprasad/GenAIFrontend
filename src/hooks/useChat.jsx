@@ -137,14 +137,15 @@ export function useChat(activeMode = 'general') {
         } catch (err) {
             if (err.name !== 'AbortError') {
                 const isRateLimit = err.message.includes('429');
+                const errorMessage = err.message.split(' for url:')[0];
                 setMessagesByMode(prev => ({
                     ...prev,
                     [mode]: (prev[mode] || []).map(m =>
                         m.id === assistantId
                             ? {
                                 ...m,
-                                content: m.content || `⚠️ Error: ${err.message}`,
-                                error: err.message,
+                                content: m.content,
+                                error: errorMessage,
                                 isRateLimit: isRateLimit
                             }
                             : m

@@ -14,7 +14,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: 'build', // matching CRA's build directory
+    outDir: 'dist', // Standard Vite output directory for Netlify/Vercel
   },
   resolve: {
     extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json']
