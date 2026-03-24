@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 
-const API_BASE = import.meta.env.GenAI_API_URL || 'https://genaibackend-v224.onrender.com';
+const API_BASE = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'production' ? '' : 'https://genaibackend-v224.onrender.com');
 
 let messageIdCounter = 1;
 
