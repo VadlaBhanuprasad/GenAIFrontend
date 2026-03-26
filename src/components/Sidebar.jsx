@@ -141,7 +141,7 @@ const MODES = [
     { key: 'coding', icon: <CodeOutlined />, name: 'Coding Assistant' },
     { key: 'document', icon: <FileTextOutlined />, name: 'Document Q&A' },
     { key: 'weblink', icon: <LinkOutlined />, name: 'Web Link Summary' },
-    { key: 'truelover', icon: <HeartOutlined />, name: 'True Lover' },
+    // { key: 'truelover', icon: <HeartOutlined />, name: 'True Lover' },
 ];
 
 const Sidebar = ({ selectedMode, onModeSelect, onNewChat, onOpenSettings }) => {
