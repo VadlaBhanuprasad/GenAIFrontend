@@ -38,8 +38,8 @@ const MessageBubble = ({ message, selectedMode, onRetry }) => {
   const isDiya = selectedMode === 'truelover';
 
   return (
-    <div className={`py-8 px-4 sm:px-6 md:px-8 w-full ${isUser ? "bg-white" : "bg-gray-50 border-y border-gray-200"}`}>
-      <div className={`max-w-7xl mx-auto flex gap-6 ${isUser ? "flex-row-reverse" : "flex-row"}`}>
+    <div className={`py-6 px-4 sm:py-8 sm:px-6 md:px-8 w-full ${isUser ? "bg-white" : "bg-gray-50 border-y border-gray-200"}`}>
+      <div className={`max-w-7xl mx-auto flex gap-3 sm:gap-6 ${isUser ? "flex-row-reverse" : "flex-row"}`}>
         <div className="flex-shrink-0 flex items-start justify-center">
           {isUser ? (
             <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 ring-1 ring-indigo-200 shadow-sm">

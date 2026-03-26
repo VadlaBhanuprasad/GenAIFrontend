@@ -15,12 +15,14 @@ import {
 const { Text } = Typography;
 
 const InputZone = styled.div`
-  padding: 12px 40px 8px;
+  /* Mobile First */
+  padding: 8px 12px 4px;
   background: #ffffff;
   border-top: 1px solid #f0f0f0;
 
-  @media (max-width: 768px) {
-    padding: 12px 16px 8px;
+  /* Desktop Styles */
+  @media (min-width: 769px) {
+    padding: 12px 40px 8px;
   }
 `;
 
@@ -32,19 +34,34 @@ const PDFBanner = styled.div`
   border: 1px solid #d0b8ff;
   border-radius: 10px;
   padding: 8px 14px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   font-size: 13px;
   color: #7c3aed;
   font-weight: 500;
+  
+  /* Make banner text more compact on mobile */
+  span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+  }
+
+  @media (min-width: 769px) {
+    margin-bottom: 10px;
+    span {
+      max-width: none;
+    }
+  }
 `;
 
 const InputBox = styled.div`
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   border: 1.5px solid #d1d1d6;
   border-radius: 14px;
-  padding: 10px 12px;
+  padding: 8px 10px;
   background: #fafafa;
   transition: border-color 0.2s, box-shadow 0.2s;
 
@@ -52,6 +69,11 @@ const InputBox = styled.div`
     border-color: #7c3aed;
     box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
     background: #ffffff;
+  }
+
+  @media (min-width: 769px) {
+    padding: 10px 12px;
+    gap: 10px;
   }
 `;
 
@@ -65,12 +87,19 @@ const AttachBtn = styled(Button)`
   background: transparent !important;
   box-shadow: none !important;
   padding: 4px !important;
-  height: auto !important;
+  height: 32px !important;
+  width: 32px !important;
   flex-shrink: 0;
-  font-size: 16px !important;
+  font-size: 18px !important;
 
   &:hover {
     color: #7c3aed !important;
+  }
+
+  @media (min-width: 769px) {
+     height: auto !important;
+     width: auto !important;
+     font-size: 16px !important;
   }
 `;
 
@@ -79,14 +108,14 @@ const StyledTextarea = styled.textarea`
   border: none;
   outline: none;
   resize: none;
-  font-size: 14px;
+  font-size: 15px;
   font-family: inherit;
   color: #1a1a1a;
   background: transparent;
-  line-height: 1.5;
-  max-height: 160px;
+  line-height: 1.4;
+  max-height: 120px;
   overflow-y: auto;
-  padding: 2px 0;
+  padding: 4px 0;
 
   &::placeholder {
     color: #b0b0b8;
@@ -94,19 +123,30 @@ const StyledTextarea = styled.textarea`
 
   &::-webkit-scrollbar { width: 4px; }
   &::-webkit-scrollbar-thumb { background: #d1d1d6; border-radius: 4px; }
+
+  @media (min-width: 769px) {
+    font-size: 14px;
+    line-height: 1.5;
+    max-height: 160px;
+  }
 `;
 
 const EnterHint = styled(Text)`
+  display: none;
   font-size: 12px;
   color: #b0b0b8;
   white-space: nowrap;
   flex-shrink: 0;
+
+  @media (min-width: 769px) {
+    display: inline-block;
+  }
 `;
 
 const SendBtn = styled(Button)`
-  width: 36px !important;
-  height: 36px !important;
-  border-radius: 10px !important;
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 9px !important;
   background: ${({ $disabled }) =>
     $disabled ? '#e5e5ea' : 'linear-gradient(135deg,#7c3aed,#9d5cf0)'} !important;
   border: none !important;
@@ -119,39 +159,58 @@ const SendBtn = styled(Button)`
   transition: transform 0.15s !important;
 
   .anticon {
-    font-size: 15px !important;
+    font-size: 14px !important;
     color: ${({ $disabled }) => ($disabled ? '#b0b0b8' : '#ffffff')} !important;
   }
 
   &:hover:not([disabled]) {
     transform: scale(1.06) !important;
   }
+
+  @media (min-width: 769px) {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 10px !important;
+    .anticon {
+        font-size: 15px !important;
+    }
+  }
 `;
 
 const StopBtn = styled(Button)`
-  border-radius: 10px !important;
+  border-radius: 9px !important;
   border: 1.5px solid #ff4d4f !important;
   color: #ff4d4f !important;
   background: #fff5f5 !important;
-  font-size: 13px !important;
+  font-size: 12px !important;
   font-weight: 500 !important;
-  height: 36px !important;
+  height: 34px !important;
   flex-shrink: 0;
 
   &:hover {
     background: #ffe0e0 !important;
   }
+
+  @media (min-width: 769px) {
+    border-radius: 10px !important;
+    font-size: 13px !important;
+    height: 36px !important;
+  }
 `;
 
 const Footer = styled.div`
   text-align: center;
-  margin-top: 8px;
-  margin-bottom: 4px;
+  margin-top: 6px;
+  margin-bottom: 2px;
 `;
 
 const FooterText = styled(Text)`
-  font-size: 11.5px;
+  font-size: 10px;
   color: #b0b0b8;
+  
+  @media (min-width: 769px) {
+    font-size: 11.5px;
+  }
 `;
 
 const ChatInput = ({

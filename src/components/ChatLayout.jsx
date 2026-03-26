@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { message } from 'antd';
+import { message, Button } from 'antd';
+import { MenuOutlined } from '@ant-design/icons';
 import Sidebar from './Sidebar';
 import WelcomeScreen from './WelcomeScreen';
 import ChatWindow from './ChatWindow';
@@ -15,6 +16,7 @@ const LayoutWrapper = styled.div`
   overflow: hidden;
   background: #ffffff;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  position: relative;
 `;
 
 const MainArea = styled.main`
@@ -23,11 +25,26 @@ const MainArea = styled.main`
   flex-direction: column;
   overflow: hidden;
   position: relative;
+  width: 100%;
+`;
+
+const MobileHeader = styled.header`
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #ffffff;
+  height: 56px;
+
+  @media (min-width: 769px) {
+    display: none;
+  }
 `;
 
 const ChatLayout = () => {
     const [selectedMode, setSelectedMode] = useState('general');
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     
     // Pass selectedMode so the hook operates on the correct chat history
     const { messages, isStreaming, sendMessage, retryLastMessage, stopStreaming, newChat } = useChat(selectedMode);
@@ -74,12 +91,28 @@ const ChatLayout = () => {
     return (
         <LayoutWrapper>
             <Sidebar
+                isOpen={isSidebarOpen}
+                onClose={() => setIsSidebarOpen(false)}
                 selectedMode={selectedMode}
                 onModeSelect={handleModeSelect}
                 onNewChat={handleNewChat}
                 onOpenSettings={() => setIsSettingsOpen(true)}
             />
             <MainArea>
+                <MobileHeader>
+                    <Button 
+                        icon={<MenuOutlined />} 
+                        type="text" 
+                        onClick={() => setIsSidebarOpen(true)}
+                        style={{ fontSize: '20px', padding: 0, width: '40px', height: '40px' }}
+                    />
+                    <div style={{ marginLeft: '12px', fontWeight: 600, fontSize: '16px' }}>
+                        {selectedMode === 'general' ? 'General Chat' : 
+                         selectedMode === 'coding' ? 'Coding Assistant' : 
+                         selectedMode === 'document' ? 'Document Q&A' : 'Web Summary'}
+                    </div>
+                </MobileHeader>
+
                 {isWelcome ? (
                     <WelcomeScreen />
                 ) : (

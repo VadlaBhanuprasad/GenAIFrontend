@@ -39,22 +39,30 @@ const IconBox = styled.div`
 
 const Heading = styled(Title)`
   && {
-    font-size: 32px;
+    font-size: 24px;
     font-weight: 700;
     color: inherit;
     margin-bottom: 10px;
     text-align: center;
+
+    @media (min-width: 769px) {
+      font-size: 32px;
+    }
   }
 `;
 
 const SubText = styled(Text)`
-  font-size: 15px;
+  font-size: 14px;
   color: inherit;
   opacity: 0.8;
   text-align: center;
   max-width: 360px;
   line-height: 1.6;
   display: block;
+
+  @media (min-width: 769px) {
+    font-size: 15px;
+  }
 `;
 
 const WelcomeScreen = () => {
