@@ -2,15 +2,15 @@ import React from 'react';
 import styled from 'styled-components';
 import { Button, Typography } from 'antd';
 import {
-    PlusOutlined,
-    ThunderboltOutlined,
-    CodeOutlined,
-    FileTextOutlined,
-    LinkOutlined,
-    HeartOutlined,
-    DatabaseOutlined,
-    SettingOutlined,
-    CloseOutlined,
+  PlusOutlined,
+  ThunderboltOutlined,
+  CodeOutlined,
+  FileTextOutlined,
+  LinkOutlined,
+  HeartOutlined,
+  DatabaseOutlined,
+  SettingOutlined,
+  CloseOutlined,
 } from '@ant-design/icons';
 
 const { Text } = Typography;
@@ -179,54 +179,56 @@ const NavItem = styled.div`
 `;
 
 const MODES = [
-    { key: 'general', icon: <ThunderboltOutlined />, name: 'General Chat' },
-    { key: 'coding', icon: <CodeOutlined />, name: 'Coding Assistant' },
-    { key: 'document', icon: <FileTextOutlined />, name: 'Document Q&A' },
-    { key: 'weblink', icon: <LinkOutlined />, name: 'Web Link Summary' },
+  { key: 'general', icon: <ThunderboltOutlined />, name: 'General Chat' },
+  { key: 'coding', icon: <CodeOutlined />, name: 'Coding Assistant' },
+  { key: 'document', icon: <FileTextOutlined />, name: 'Document Q&A' },
+  { key: 'weblink', icon: <LinkOutlined />, name: 'Web Link Summary' },
 ];
 
 const Sidebar = ({ selectedMode, onModeSelect, onNewChat, onOpenSettings, isOpen, onClose }) => {
-    return (
-        <>
-            <Overlay $isOpen={isOpen} onClick={onClose} />
-            <SidebarContainer $isOpen={isOpen}>
-                <MobileHeader>
-                    <Text strong style={{ fontSize: 16 }}>AI Assistant</Text>
-                    <Button icon={<CloseOutlined />} type="text" onClick={onClose} />
-                </MobileHeader>
+  return (
+    <>
+      <Overlay $isOpen={isOpen} onClick={onClose} />
+      <SidebarContainer $isOpen={isOpen}>
+        <MobileHeader>
+          <Text strong style={{ fontSize: 16 }}>AI Assistant</Text>
+          <Button icon={<CloseOutlined />} type="text" onClick={onClose} />
+        </MobileHeader>
 
-                <NewChatBtn className="sidebar-btn" icon={<PlusOutlined />} onClick={() => { onNewChat(); onClose(); }}>
-                    New Chat
-                </NewChatBtn>
+        <NewChatBtn className="sidebar-btn" icon={<PlusOutlined />} onClick={() => { onNewChat(); onClose(); }}>
+          New Chat
+        </NewChatBtn>
 
-                <SectionLabel>Modes</SectionLabel>
+        <SectionLabel>Modes</SectionLabel>
 
-                <ModeList>
-                    {MODES.map(mode => (
-                        <ModeItem
-                            key={mode.key}
-                            $active={selectedMode === mode.key ? 1 : 0}
-                            onClick={() => { onModeSelect(mode.key); onClose(); }}
-                        >
-                            {mode.icon}
-                            <span>{mode.name}</span>
-                        </ModeItem>
-                    ))}
-                </ModeList>
+        <ModeList>
+          {MODES.map(mode => (
+            <ModeItem
+              key={mode.key}
+              $active={selectedMode === mode.key ? 1 : 0}
+              onClick={() => { onModeSelect(mode.key); onClose(); }}
+            >
+              {mode.icon}
+              <span>{mode.name}</span>
+            </ModeItem>
+          ))}
+        </ModeList>
 
-                <BottomNav>
-                    <NavItem className="bottom-nav-item">
-                        <DatabaseOutlined />
-                        Knowledge Base
-                    </NavItem>
-                    <NavItem className="bottom-nav-item" onClick={onOpenSettings}>
-                        <SettingOutlined />
-                        Settings
-                    </NavItem>
-                </BottomNav>
-            </SidebarContainer>
-        </>
-    );
+        <BottomNav>
+          <NavItem className="bottom-nav-item">
+            <DatabaseOutlined />
+            Knowledge Base
+          </NavItem>
+          <NavItem className="bottom-nav-item"
+          // onClick={onOpenSettings}
+          >
+            <SettingOutlined />
+            Settings
+          </NavItem>
+        </BottomNav>
+      </SidebarContainer>
+    </>
+  );
 };
 
 export default Sidebar;
