@@ -183,23 +183,29 @@ const SendBtn = styled(Button)`
 `;
 
 const StopBtn = styled(Button)`
-  border-radius: 9px !important;
-  border: 1.5px solid #ff4d4f !important;
-  color: #ff4d4f !important;
-  background: #fff5f5 !important;
-  font-size: 12px !important;
-  font-weight: 500 !important;
-  height: 34px !important;
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 6px !important;
+  border: none !important;
+  color: #ffffff !important;
+  background: #ff4d4f !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   flex-shrink: 0;
+  padding: 0 !important;
+  transition: all 0.2s !important;
+  box-shadow: 0 2px 8px rgba(255, 77, 79, 0.25) !important;
 
   &:hover {
-    background: #ffe0e0 !important;
+    background: #ff7875 !important;
+    transform: scale(1.05) !important;
   }
 
   @media (min-width: 769px) {
-    border-radius: 10px !important;
-    font-size: 13px !important;
-    height: 36px !important;
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 7px !important;
   }
 `;
 
@@ -356,8 +362,8 @@ const ChatInput = ({
         <EnterHint>⏎ Enter</EnterHint>
 
         {isStreaming ? (
-          <StopBtn icon={<StopOutlined />} onClick={onStop}>
-            Stop
+          <StopBtn onClick={onStop}>
+             <div style={{ width: '8px', height: '8px', background: 'white', borderRadius: '1.2px' }} />
           </StopBtn>
         ) : (
           <SendBtn
