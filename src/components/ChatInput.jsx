@@ -16,7 +16,7 @@ const { Text } = Typography;
 
 const InputZone = styled.div`
   /* Mobile First */
-  padding: 8px 12px calc(4px + env(safe-area-inset-bottom));
+  padding: 6px 10px calc(2px + env(safe-area-inset-bottom));
   background: #ffffff;
   border-top: 1px solid #f0f0f0;
   flex-shrink: 0;
@@ -35,9 +35,9 @@ const PDFBanner = styled.div`
   background: #f3effe;
   border: 1px solid #d0b8ff;
   border-radius: 10px;
-  padding: 8px 14px;
-  margin-bottom: 8px;
-  font-size: 13px;
+  padding: 6px 12px;
+  margin-bottom: 6px;
+  font-size: 12px;
   color: #7c3aed;
   font-weight: 500;
   
@@ -50,7 +50,9 @@ const PDFBanner = styled.div`
   }
 
   @media (min-width: 769px) {
+    padding: 8px 14px;
     margin-bottom: 10px;
+    font-size: 13px;
     span {
       max-width: none;
     }
@@ -60,10 +62,10 @@ const PDFBanner = styled.div`
 const InputBox = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   border: 1.5px solid #d1d1d6;
-  border-radius: 14px;
-  padding: 8px 10px;
+  border-radius: 12px;
+  padding: 6px 8px;
   background: #fafafa;
   transition: border-color 0.2s, box-shadow 0.2s;
 
@@ -76,6 +78,7 @@ const InputBox = styled.div`
   @media (min-width: 769px) {
     padding: 10px 12px;
     gap: 10px;
+    border-radius: 14px;
   }
 `;
 
@@ -89,10 +92,10 @@ const AttachBtn = styled(Button)`
   background: transparent !important;
   box-shadow: none !important;
   padding: 4px !important;
-  height: 32px !important;
-  width: 32px !important;
+  height: 28px !important;
+  width: 28px !important;
   flex-shrink: 0;
-  font-size: 18px !important;
+  font-size: 16px !important;
 
   &:hover {
     color: #7c3aed !important;
@@ -110,12 +113,12 @@ const StyledTextarea = styled.textarea`
   border: none;
   outline: none;
   resize: none;
-  font-size: 15px;
+  font-size: 14px;
   font-family: inherit;
   color: #1a1a1a;
   background: transparent;
-  line-height: 1.4;
-  max-height: 120px;
+  line-height: 1.3;
+  max-height: 100px;
   overflow-y: auto;
   padding: 4px 0;
 
@@ -146,9 +149,9 @@ const EnterHint = styled(Text)`
 `;
 
 const SendBtn = styled(Button)`
-  width: 34px !important;
-  height: 34px !important;
-  border-radius: 9px !important;
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 8px !important;
   background: ${({ $disabled }) =>
     $disabled ? '#e5e5ea' : 'linear-gradient(135deg,#7c3aed,#9d5cf0)'} !important;
   border: none !important;
@@ -161,7 +164,7 @@ const SendBtn = styled(Button)`
   transition: transform 0.15s !important;
 
   .anticon {
-    font-size: 14px !important;
+    font-size: 12px !important;
     color: ${({ $disabled }) => ($disabled ? '#b0b0b8' : '#ffffff')} !important;
   }
 
