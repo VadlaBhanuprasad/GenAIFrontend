@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 
-const API_BASE = import.meta.env.MODE === 'production' ? '' : (import.meta.env.VITE_API_URL || 'https://genaibackend-v224.onrender.com');
+const API_BASE = 'https://genaibackend-v224.onrender.com';
 
 let messageIdCounter = 1;
 
@@ -128,13 +128,13 @@ export function useChat(activeMode = 'general') {
             };
 
             assistantId = messageIdCounter++;
-            const assistantMsg = { 
-                id: assistantId, 
-                role: 'assistant', 
-                content: '', 
-                timestamp: new Date(), 
+            const assistantMsg = {
+                id: assistantId,
+                role: 'assistant',
+                content: '',
+                timestamp: new Date(),
                 streaming: true,
-                isColdStarting: false 
+                isColdStarting: false
             };
 
             setMessagesByMode(prev => ({
@@ -180,7 +180,7 @@ export function useChat(activeMode = 'general') {
             if (err.name !== 'AbortError') {
                 const isRateLimit = err.message.includes('429');
                 let errorMessage = err.message.split(' for url:')[0];
-                
+
                 if (isRateLimit) {
                     errorMessage = "Rate limit reached. OpenRouter free models have strict limits. Please wait a few seconds or try again later.";
                 }
