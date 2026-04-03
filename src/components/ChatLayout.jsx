@@ -12,13 +12,8 @@ import { useChat, useDocumentUpload } from '../hooks/useChat';
 const LayoutWrapper = styled.div`
   display: flex;
   flex-direction: row;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100vw;
   height: 100dvh;
+  width: 100vw;
   overflow: hidden;
   background: #ffffff;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -26,8 +21,8 @@ const LayoutWrapper = styled.div`
 
 const MainArea = styled.main`
   flex: 1;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
+  display: flex;
+  flex-direction: column;
   height: 100%;
   width: 100%;
   overflow: hidden;

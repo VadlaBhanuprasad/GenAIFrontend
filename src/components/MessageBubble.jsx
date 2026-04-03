@@ -110,7 +110,7 @@ const MessageBubble = ({ message, selectedMode, onRetry }) => {
                     className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm active:scale-95"
                   >
                     <RotateCcw size={13} />
-                    <span>Regenerate response</span>
+                    <span>Retry</span>
                   </button>
                 </div>
               )}
