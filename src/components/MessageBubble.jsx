@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { User, Bot, Heart } from 'lucide-react';
+import { User, Bot, Heart, RotateCcw } from 'lucide-react';
 
 /* ---------- Typing indicator styles (injected once) ---------- */
 const typingStyles = `
@@ -102,17 +102,16 @@ const MessageBubble = ({ message, selectedMode, onRetry }) => {
               >
                 {message.content}
               </ReactMarkdown>
-              
+
               {message.error && (
-                <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg flex flex-col gap-3">
-                  <div className="flex">
-                    <button 
-                      onClick={onRetry}
-                      className="px-3 py-1.5 bg-white border border-red-300 text-red-700 text-xs font-semibold rounded-md hover:bg-red-50 transition-colors shadow-sm"
-                    >
-                      Retry Now
-                    </button>
-                  </div>
+                <div className="mt-4 flex">
+                  <button
+                    onClick={onRetry}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm active:scale-95"
+                  >
+                    <RotateCcw size={13} />
+                    <span>Regenerate response</span>
+                  </button>
                 </div>
               )}
 

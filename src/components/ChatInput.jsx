@@ -16,10 +16,11 @@ const { Text } = Typography;
 
 const InputZone = styled.div`
   /* Mobile First */
-  padding: 8px 12px 4px;
+  padding: 8px 12px calc(4px + env(safe-area-inset-bottom));
   background: #ffffff;
   border-top: 1px solid #f0f0f0;
   flex-shrink: 0;
+  z-index: 10;
 
   /* Desktop Styles */
   @media (min-width: 769px) {

@@ -11,22 +11,27 @@ import { useChat, useDocumentUpload } from '../hooks/useChat';
 
 const LayoutWrapper = styled.div`
   display: flex;
-  height: 100vh;
-  height: 100dvh;
+  flex-direction: row;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   width: 100vw;
+  height: 100dvh;
   overflow: hidden;
   background: #ffffff;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  position: relative;
 `;
 
 const MainArea = styled.main`
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100%;
+  width: 100%;
   overflow: hidden;
   position: relative;
-  width: 100%;
 `;
 
 const MobileHeader = styled.header`
@@ -37,6 +42,9 @@ const MobileHeader = styled.header`
   background: #ffffff;
   height: 56px;
   flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
 
   @media (min-width: 769px) {
     display: none;
@@ -118,7 +126,12 @@ const ChatLayout = () => {
                 {isWelcome ? (
                     <WelcomeScreen />
                 ) : (
-                    <ChatWindow messages={messages} selectedMode={selectedMode} onRetry={retryLastMessage} />
+                    <ChatWindow 
+                        messages={messages} 
+                        isStreaming={isStreaming} 
+                        selectedMode={selectedMode} 
+                        onRetry={retryLastMessage} 
+                    />
                 )}
                 <ChatInput
                     onSend={handleSend}

@@ -29,23 +29,33 @@ const EmptyState = styled.div`
   font-size: 14px;
 `;
 
-const ChatWindow = ({ messages, selectedMode, onRetry }) => {
+const ChatWindow = ({ messages, isStreaming, selectedMode, onRetry }) => {
   const bottomRef = useRef(null);
+  const containerRef = useRef(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Check if we are close to the bottom (within 100px)
+    const isAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150;
+
+    // Only auto-scroll if we are near the bottom OR it's a new message
+    if (isAtBottom || isStreaming) {
+      bottomRef.current?.scrollIntoView({ behavior: isStreaming ? 'auto' : 'smooth' });
+    }
+  }, [messages, isStreaming]);
 
   if (messages.length === 0) {
     return <EmptyState />;
   }
 
   return (
-    <WindowWrapper>
+    <WindowWrapper ref={containerRef}>
       {messages.map(msg => (
         <MessageBubble key={msg.id} message={msg} selectedMode={selectedMode} onRetry={onRetry} />
       ))}
-      <div ref={bottomRef} />
+      <div ref={bottomRef} style={{ height: '1px', flexShrink: 0 }} />
     </WindowWrapper>
   );
 };
