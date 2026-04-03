@@ -18,62 +18,94 @@ export function useChat(activeMode = 'general') {
     const messages = messagesByMode[activeMode] || [];
 
     // ── Shared SSE parser ───────────────────────────────────────────────────
-    const _streamSSE = useCallback(async (url, body, assistantId, mode) => {
+    const _streamSSE = useCallback(async (url, body, assistantId, mode, isInitialMessage) => {
         const controller = new AbortController();
         abortRef.current = controller;
 
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-            signal: controller.signal,
-        });
-
-        if (!response.ok) {
-            const err = await response.json().catch(() => ({}));
-            throw new Error(err.detail || `HTTP ${response.status}`);
+        // Set a timer to detect "Cold Start" ONLY for the first message
+        let coldStartTimer = null;
+        if (isInitialMessage) {
+            coldStartTimer = setTimeout(() => {
+                setMessagesByMode(prev => ({
+                    ...prev,
+                    [mode]: (prev[mode] || []).map(m =>
+                        m.id === assistantId ? { ...m, isColdStarting: true } : m
+                    )
+                }));
+            }, 5000); // 5 seconds threshold
         }
 
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let buffer = '';
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+                signal: controller.signal,
+            });
 
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            buffer += decoder.decode(value, { stream: true });
-            const lines = buffer.split('\n');
-            buffer = lines.pop(); // keep incomplete last line
-
-            for (const line of lines) {
-                if (!line.startsWith('data: ')) continue;
-                const chunk = line.slice(6); // strip "data: "
-                if (chunk === '[DONE]') return;
-                if (chunk.startsWith('[ERROR]')) {
-                    throw new Error(chunk.slice(8));
-                }
-
-                let textChunk = chunk;
-                try {
-                    textChunk = JSON.parse(chunk);
-                } catch (e) {
-                    // fallback to raw string if it's not JSON
-                }
-
-                // Append chunk to assistant message in the right mode
-                setMessagesByMode(prev => {
-                    const modeMsgs = prev[mode] || [];
-                    return {
-                        ...prev,
-                        [mode]: modeMsgs.map(m =>
-                            m.id === assistantId
-                                ? { ...m, content: m.content + textChunk }
-                                : m
-                        )
-                    };
-                });
+            if (!response.ok) {
+                if (coldStartTimer) clearTimeout(coldStartTimer);
+                const err = await response.json().catch(() => ({}));
+                throw new Error(err.detail || `HTTP ${response.status}`);
             }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+            let receivedFirstChunk = false;
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                if (!receivedFirstChunk) {
+                    receivedFirstChunk = true;
+                    if (coldStartTimer) {
+                        clearTimeout(coldStartTimer);
+                        setMessagesByMode(prev => ({
+                            ...prev,
+                            [mode]: (prev[mode] || []).map(m =>
+                                m.id === assistantId ? { ...m, isColdStarting: false } : m
+                            )
+                        }));
+                    }
+                }
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n');
+                buffer = lines.pop(); // keep incomplete last line
+
+                for (const line of lines) {
+                    if (!line.startsWith('data: ')) continue;
+                    const chunk = line.slice(6); // strip "data: "
+                    if (chunk === '[DONE]') return;
+                    if (chunk.startsWith('[ERROR]')) {
+                        throw new Error(chunk.slice(8));
+                    }
+
+                    let textChunk = chunk;
+                    try {
+                        textChunk = JSON.parse(chunk);
+                    } catch (e) {
+                        // fallback to raw string if it's not JSON
+                    }
+
+                    // Append chunk to assistant message in the right mode
+                    setMessagesByMode(prev => {
+                        const modeMsgs = prev[mode] || [];
+                        return {
+                            ...prev,
+                            [mode]: modeMsgs.map(m =>
+                                m.id === assistantId
+                                    ? { ...m, content: m.content + textChunk }
+                                    : m
+                            )
+                        };
+                    });
+                }
+            }
+        } finally {
+            if (coldStartTimer) clearTimeout(coldStartTimer);
         }
     }, []);
 
@@ -85,6 +117,7 @@ export function useChat(activeMode = 'general') {
         lastRequestRef.current = { text, mode, sessionId };
 
         let assistantId;
+        const isInitialMessage = (messagesByMode[mode] || []).length === 0;
 
         if (!isRetry) {
             const userMsg = {
@@ -95,7 +128,14 @@ export function useChat(activeMode = 'general') {
             };
 
             assistantId = messageIdCounter++;
-            const assistantMsg = { id: assistantId, role: 'assistant', content: '', timestamp: new Date(), streaming: true };
+            const assistantMsg = { 
+                id: assistantId, 
+                role: 'assistant', 
+                content: '', 
+                timestamp: new Date(), 
+                streaming: true,
+                isColdStarting: false 
+            };
 
             setMessagesByMode(prev => ({
                 ...prev,
@@ -111,7 +151,7 @@ export function useChat(activeMode = 'general') {
             setMessagesByMode(prev => ({
                 ...prev,
                 [mode]: (prev[mode] || []).map(m =>
-                    m.id === assistantId ? { ...m, content: '', error: null, streaming: true } : m
+                    m.id === assistantId ? { ...m, content: '', error: null, streaming: true, isColdStarting: false } : m
                 )
             }));
         }
@@ -124,20 +164,27 @@ export function useChat(activeMode = 'general') {
                     `${API_BASE}/api/pdf/query`,
                     { question: text, session_id: sessionId },
                     assistantId,
-                    mode
+                    mode,
+                    isInitialMessage
                 );
             } else {
                 await _streamSSE(
                     `${API_BASE}/api/chat`,
                     { message: text, mode, session_id: sessionId },
                     assistantId,
-                    mode
+                    mode,
+                    isInitialMessage
                 );
             }
         } catch (err) {
             if (err.name !== 'AbortError') {
                 const isRateLimit = err.message.includes('429');
-                const errorMessage = err.message.split(' for url:')[0];
+                let errorMessage = err.message.split(' for url:')[0];
+                
+                if (isRateLimit) {
+                    errorMessage = "Rate limit reached. OpenRouter free models have strict limits. Please wait a few seconds or try again later.";
+                }
+
                 setMessagesByMode(prev => ({
                     ...prev,
                     [mode]: (prev[mode] || []).map(m =>
@@ -155,7 +202,7 @@ export function useChat(activeMode = 'general') {
         } finally {
             setMessagesByMode(prev => ({
                 ...prev,
-                [mode]: (prev[mode] || []).map(m => m.id === assistantId ? { ...m, streaming: false } : m)
+                [mode]: (prev[mode] || []).map(m => m.id === assistantId ? { ...m, streaming: false, isColdStarting: false } : m)
             }));
             setIsStreaming(false);
         }
