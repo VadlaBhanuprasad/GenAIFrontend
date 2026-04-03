@@ -12,6 +12,7 @@ import { useChat, useDocumentUpload } from '../hooks/useChat';
 const LayoutWrapper = styled.div`
   display: flex;
   height: 100vh;
+  height: 100dvh;
   width: 100vw;
   overflow: hidden;
   background: #ffffff;
@@ -35,6 +36,7 @@ const MobileHeader = styled.header`
   border-bottom: 1px solid #f0f0f0;
   background: #ffffff;
   height: 56px;
+  flex-shrink: 0;
 
   @media (min-width: 769px) {
     display: none;

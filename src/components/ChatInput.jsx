@@ -19,6 +19,7 @@ const InputZone = styled.div`
   padding: 8px 12px 4px;
   background: #ffffff;
   border-top: 1px solid #f0f0f0;
+  flex-shrink: 0;
 
   /* Desktop Styles */
   @media (min-width: 769px) {
